@@ -1,0 +1,77 @@
+@charset "UTF-8";
+/* 整个项目都能使用上的 样式 */
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #ccc;
+}
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.lv-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+  border-bottom: 1px solid #000;
+}
+.lv-head .logo {
+  font-size: 26px;
+  text-decoration: none;
+}
+.lv-head .right {
+  display: flex;
+  align-items: center;
+}
+
+.lv-foot {
+  height: 50px;
+  border-top: 1px solid #000;
+}
+
+.lv-menu {
+  width: 250px;
+  height: 100%;
+  border-right: 1px solid pink;
+  overflow-y: auto;
+}
+.lv-menu li {
+  height: 50px;
+  line-height: 50px;
+  border-bottom: 1px solid #000;
+}
+
+.lv-main {
+  flex: 1;
+  display: flex;
+  background: #FFF;
+}
+.lv-main .body {
+  flex: 1;
+  padding: 0 20px;
+}
+
+.search-bar {
+  margin: 10px 0;
+}
+
+.table-hover > tbody > tr:hover {
+  background-color: aqua;
+}
+
+.pagination {
+  float: right;
+}
+
+.lv-main .body iframe {
+  width: 100%;
+  height: 100%;
+}
+
+/*# sourceMappingURL=common.css.map */

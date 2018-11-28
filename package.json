@@ -1,0 +1,22 @@
+{
+  "name": "node-project",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "supervisor server.js"
+  },
+  "dependencies": {
+    "async": "^2.6.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "ejs": "~2.5.7",
+    "express": "~4.16.0",
+    "http-errors": "~1.6.2",
+    "mongodb": "^3.1.10",
+    "morgan": "~1.9.0"
+  },
+  "main": "index.js",
+  "repository": "https://gitee.com/Elvmx/node-project.git",
+  "author": "xiezhli xiezhili001@163.com",
+  "license": "MIT"
+}

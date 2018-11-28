@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+
+  <div>
+    <input type="text" placeholder="name">
+    <input type="password" placeholder="pwd">
+    <button id="btn">按钮</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    $(function () {
+      $('#btn').click(function () {
+        $.post('http://localhost:3000/api/login', {
+          username: $('input[type=text]').val(),
+          password: $('input[type=password]').val()
+        }, function (res) {
+          if (res.code === 0) {
+            console.log(res);
+            // 成功
+            alert('登录成功');
+            location.href = '/index.html';
+            // 用 localStorage
+            localStorage.setItem('nickname', res.data.nickname);
+          } else {
+            alert(res.msg);
+          }
+        })
+      })
+    });
+  </script>
+</body>
+
+</html>
