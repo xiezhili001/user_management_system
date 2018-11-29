@@ -68,6 +68,7 @@
   </script>
 
   <script src="./js/template-web.js"></script>
+  
   <script id="tpl-user" type="text/html">
     <table class="table table-striped table-bordered table-hover">
         <thead>
@@ -90,26 +91,30 @@
               <td>{{$value.age}}</td>
               <td>{{$value.sex}}</td>
               <td>{{$value.isAdmin}}</td>
-              <td><a href="/index.html/delete?id={{$value._id}}">删除</a></td>      
+              <td><a index="{{$value._id}}" class="delete" style="cursor:pointer">删除</a></td>      
             </tr>
           {{/each}}
         </tbody>
       </table>
    
   </script>
+
   <script>
     $(function () {
       getList();
     })
+
     // 获取用户列表
     function getList(page, pageSize) {
-      if (location.search.split('&')[0].split("=")[1]) {
-        var page = location.search.split('&')[0].split("=")[1];
-        var pageSize = location.search.split('&')[1].split("=")[1];
+
+      try {
+        var page = location.search.split('&')[0].split("=")[1] || 1;
+        var pageSize = location.search.split('&')[1].split("=")[1] || 5;
+      } catch (error) {
+        var page = 1;
+        var pageSize = 5;
       }
-      console.log(location.search);
-      var page = 1;
-      var pageSize = 5;
+
 
       $.get('http://127.0.0.1:3000/api/user/list', {
         page: page,
@@ -123,7 +128,6 @@
             list: list
           });
           $('#wode').append(html);
-          console.log(totalPage);
           var str = ''
           for (var i = 0; i < totalPage; i++) {
             // console.log(1);
@@ -152,6 +156,23 @@
           </nav>                    
           `
           $('#tiaozhuang').append(str1);
+
+          $('.delete').click(function (e) {
+            e.preventDefault();
+            console.log($(this).attr('index'));
+            $.get('http://127.0.0.1:3000/api/delete', {
+              id: $(this).attr('index')
+            }, function (res) {
+              if (res.code === 0) {
+                location.reload();
+              }
+            })
+          });
+
+
+
+
+
         } else {
           alert(res.msg);
         }

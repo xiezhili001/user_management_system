@@ -2,6 +2,7 @@ var express = require('express');
 var async = require('async');
 var bodyParser = require('body-parser');
 var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectId;
 var url = 'mongodb://127.0.0.1:27017';
 var app = express();
 
@@ -196,5 +197,43 @@ app.get('/api/user/list', function (req, res) {
     })
   })
 });
+
+//删除的借口
+app.get('/api/delete', function (req, res) {
+  var id = req.query.id;
+  console.log(id);
+  var results = {};
+  MongoClient.connect(url, {
+    useNewUrlParser: true
+  }, function (err, client) {
+    if (err) {
+      results.code = -1;
+      results.msg = '数据库连接失败';
+      res.json(results);
+
+      return;
+    }
+
+    var db = client.db('project');
+    db.collection('user').deleteOne({
+      _id: ObjectId(id)
+    }, function (err, data) {
+      if (err) {
+        results.code = -1;
+        results.msg = '数据库连接失败';
+        res.json(results);
+      } else {
+        // 删除成功，页面刷新一下
+        results.code = 0;
+        results.msg = '查询成功';
+        client.close();
+        res.json(results);
+      }
+
+      client.close();
+    })
+  })
+})
+
 
 app.listen(3000);
