@@ -235,5 +235,44 @@ app.get('/api/delete', function (req, res) {
   })
 })
 
+app.get('/api/user/search', function (req, res) {
+  var name = req.query.name;
+  console.log(name);
+  var filter = new RegExp(name);
+
+  MongoClient.connect(url, {
+    useNewUrlParser: true
+  }, function (err, client) {
+    if (err) {
+      res.json({
+        code: -1,
+        msg: '链接失败'
+      })
+      return;
+    }
+
+    var db = client.db('project');
+    db.collection('user').find({
+      nickname: filter
+    }).toArray(function (err, data) {
+      if (err) {
+        res.json({
+          code: -1,
+          msg: '查询失败'
+        })
+      } else {
+        res.json({
+          code: 0,
+          msg: '查询成功',
+          data: {
+            list:data
+          }
+        })
+        console.log(data);
+      }
+    })
+
+  })
+})
 
 app.listen(3000);
