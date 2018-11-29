@@ -63,7 +63,73 @@ app.post('/api/login', function (req, res) {
 
 // 注册的请求
 app.post('/api/register', function (req, res) {
+  // console.log(req.body);
+  var name = req.body.name;
+  var pwd = req.body.pwd;
+  var nickname = req.body.nickname;
+  var age = parseInt(req.body.age);
+  var sex = req.body.sex;
+  var isAdmin = req.body.isAdmin === '是' ? true : false;
+  var results = {};
 
+  MongoClient.connect(url, {
+    useNewUrlParser: true
+  }, function (err, client) {
+    if (err) {
+      results.code = -1;
+      results.msg = '数据库连接失败';
+      res.json(results);
+      return;
+    }
+
+    var db = client.db('project');
+    async.series([
+      function (cb) {
+        db.collection('user').find({
+          username: name
+        }).count(function (err, num) {
+          if (err) {
+            cb(err)
+          } else if (num > 0) {
+            // 这个人已经注册过了，
+            cb(new Error('已经注册'));
+          } else {
+            // 可以注册了
+            cb(null);
+          }
+        })
+      },
+
+      function (cb) {
+        db.collection('user').insertOne({
+          username: name,
+          password: pwd,
+          nickname: nickname,
+          age: age,
+          sex: sex,
+          isAdmin: isAdmin
+        }, function (err) {
+          if (err) {
+            cb(err);
+          } else {
+            cb(null);
+          }
+        })
+      }
+    ], function (err, result) {
+      if (err) {
+        results.code = -1;
+        results.msg = '用户已注册';
+      } else {
+        results.code = 0;
+        results.msg = '登录成功';
+      }
+      console.log(results);
+      res.json(results);
+      // 不管成功or失败，
+      client.close();
+    })
+  })
 });
 
 // 用户列表的接口
@@ -120,7 +186,8 @@ app.get('/api/user/list', function (req, res) {
         results.data = {
           list: result[1],
           totalPage: totalPage,
-          page: page
+          pageSize: pageSize,
+          currentPage: page
         }
       }
 

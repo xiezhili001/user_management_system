@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>xx后台管理系统</title>
+  <title>我的后台管理系统</title>
   <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="./css/reset.css">
   <link rel="stylesheet" href="./css/common.css">
   <link rel="stylesheet" href="./css/index.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <style>
+
+  </style>
 </head>
+
 <body>
   <div class="container">
 
@@ -25,14 +31,21 @@
 
     <div class="lv-main">
       <ul class="lv-menu">
-        <li><a href="/users">用户管理</a></li>
-        <li><a href="/brand.html">品牌管理</a></li>
-        <li><a href="/phone.html">手机管理</a></li>
+        <li><a id="user" style="cursor:pointer">用户管理</a></li>
+        <li><a id="brand" style="cursor:pointer">品牌管理</a></li>
+        <li><a id="phone" style="cursor:pointer">手机管理</a></li>
       </ul>
 
+      <div class="body" style="background:#fff">
+        <form class="form-inline search-bar">
+          <input type="text" class="form-control">
+          <button class="btn btn-primary">搜索</button>
+        </form>
 
-      <div class="body">
-        <iframe src="./users.html"></iframe>
+        <div id="wode">
+
+        </div>
+        <div id="tiaozhuang"></div>
       </div>
 
     </div>
@@ -42,5 +55,109 @@
     </div>
 
   </div>
+  <script>
+    $('#user').click(function(){
+     location.href="/index.html"
+    })
+    $('#brand').click(function(){
+      $('.body').html('<iframe src="./brand.html"></iframe>')
+    })
+    $('#phone').click(function(){
+      $('.body').html('<iframe src="./phone.html"></iframe>')
+    })
+  </script>
+
+  <script src="./js/template-web.js"></script>
+  <script id="tpl-user" type="text/html">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>用户名</th>
+            <th>昵称</th>
+            <th>年龄</th>
+            <th>性别</th>
+            <th>是否管理员</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+            {{each list}}
+            <tr>
+              <td>{{$index+1}}</td>
+              <td>{{$value.username}}</td>
+              <td>{{$value.password}}</td>
+              <td>{{$value.age}}</td>
+              <td>{{$value.sex}}</td>
+              <td>{{$value.isAdmin}}</td>
+              <td><a href="/index.html/delete?id={{$value._id}}">删除</a></td>      
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+   
+  </script>
+  <script>
+    $(function () {
+      getList();
+    })
+    // 获取用户列表
+    function getList(page, pageSize) {
+      if (location.search.split('&')[0].split("=")[1]) {
+        var page = location.search.split('&')[0].split("=")[1];
+        var pageSize = location.search.split('&')[1].split("=")[1];
+      }
+      console.log(location.search);
+      var page = 1;
+      var pageSize = 5;
+
+      $.get('http://127.0.0.1:3000/api/user/list', {
+        page: page,
+        pageSize: pageSize
+      }, function (res) {
+        if (res.code === 0) {
+          var list = res.data.list;
+          var totalPage = res.data.totalPage;
+          var currentPage = res.data.currentPage;
+          var html = template('tpl-user', {
+            list: list
+          });
+          $('#wode').append(html);
+          console.log(totalPage);
+          var str = ''
+          for (var i = 0; i < totalPage; i++) {
+            // console.log(1);
+            str +=
+              ` <li class="${ currentPage === (i+1) ? 'active': ''}"><a href="/index.html?page=${ i+1 }&pageSize=${ pageSize } ">
+                 ${i + 1}</a></li> `
+          }
+
+          var str1 =
+            `     
+            <nav>
+            <ul class="pagination">
+              <li>
+                <a href="/index.html?page=${currentPage - 1 < 1 ? 1: currentPage - 1 }&pageSize=${pageSize}" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              ${str}
+              <li>
+                <a href="/index.html?page=${ currentPage + 1 > totalPage ? totalPage: currentPage + 1 }&pageSize=${pageSize } "
+                  aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>                    
+          `
+          $('#tiaozhuang').append(str1);
+        } else {
+          alert(res.msg);
+        }
+      })
+    }
+  </script>
 </body>
+
 </html>
