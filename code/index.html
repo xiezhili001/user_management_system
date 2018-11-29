@@ -31,9 +31,9 @@
 
     <div class="lv-main">
       <ul class="lv-menu">
-        <li><a id="user" style="cursor:pointer">用户管理</a></li>
-        <li><a id="brand" style="cursor:pointer">品牌管理</a></li>
-        <li><a id="phone" style="cursor:pointer">手机管理</a></li>
+        <li><a id="user" style="cursor:pointer" href="index.html">用户管理</a></li>
+        <li><a id="brand" style="cursor:pointer" href="/brand.html">品牌管理</a></li>
+        <li><a id="phone" style="cursor:pointer" href="/phone.html">手机管理</a></li>
       </ul>
 
       <div class="body" style="background:#fff">
@@ -55,17 +55,7 @@
     </div>
 
   </div>
-  <script>
-    $('#user').click(function(){
-     location.href="/index.html"
-    })
-    $('#brand').click(function(){
-      $('.body').html('<iframe src="./brand.html"></iframe>')
-    })
-    $('#phone').click(function(){
-      $('.body').html('<iframe src="./phone.html"></iframe>')
-    })
-  </script>
+  
 
   <script src="./js/template-web.js"></script>
 

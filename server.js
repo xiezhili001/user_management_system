@@ -5,6 +5,10 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 var url = 'mongodb://127.0.0.1:27017';
 var app = express();
+var multer = require('multer');
+var upload = multer({dest: 'C:/tmp'});
+var fs = require('fs');
+var path = require('path');
 
 //post请求传数据
 app.use(bodyParser.urlencoded({
@@ -64,7 +68,6 @@ app.post('/api/login', function (req, res) {
 
 // 注册的请求
 app.post('/api/register', function (req, res) {
-  // console.log(req.body);
   var name = req.body.name;
   var pwd = req.body.pwd;
   var nickname = req.body.nickname;
@@ -125,7 +128,6 @@ app.post('/api/register', function (req, res) {
         results.code = 0;
         results.msg = '登录成功';
       }
-      console.log(results);
       res.json(results);
       // 不管成功or失败，
       client.close();
@@ -201,7 +203,6 @@ app.get('/api/user/list', function (req, res) {
 //删除的借口
 app.get('/api/delete', function (req, res) {
   var id = req.query.id;
-  console.log(id);
   var results = {};
   MongoClient.connect(url, {
     useNewUrlParser: true
@@ -235,9 +236,9 @@ app.get('/api/delete', function (req, res) {
   })
 })
 
+// 用户搜索
 app.get('/api/user/search', function (req, res) {
   var name = req.query.name;
-  console.log(name);
   var filter = new RegExp(name);
 
   MongoClient.connect(url, {
@@ -268,11 +269,120 @@ app.get('/api/user/search', function (req, res) {
             list:data
           }
         })
-        console.log(data);
       }
     })
 
   })
 })
+
+//手机列表的借口
+app.get('/api/phone/list', function (req, res) {
+ 
+  var page = parseInt(req.query.page);
+  var pageSize = parseInt(req.query.pageSize);
+  var totalSize = 0;
+  var totalPage = 0;
+
+  var results = {};
+
+  MongoClient.connect(url, {
+    useNewUrlParser: true
+  }, function (err, client) {
+    if (err) {
+      results.code = -1;
+      results.msg = '数据库连接失败';
+      res.json(results);
+      // 关闭数据库连接
+      return;
+    }
+
+    var db = client.db('project');
+
+    async.series([
+      function (cb) {
+        db.collection('phone').find().count(function (err, num) {
+          if (err) {
+            cb(err);
+          } else {
+            totalSize = num;
+            cb(null);
+          }
+        })
+      },
+      function (cb) {
+        db.collection('phone').find().limit(pageSize).skip(page * pageSize - pageSize).toArray(function (err, data) {
+          if (err) {
+            cb(err);
+          } else {
+            cb(null, data);
+          }
+        })
+      }
+    ], function (err, result) {
+      if (err) {
+        results.code = -1;
+        results.msg = err.message;
+      } else {
+        totalPage = Math.ceil(totalSize / pageSize);
+
+        results.code = 0;
+        results.msg = '查询成功';
+        results.data = {
+          list: result[1],
+          totalPage: totalPage,
+          pageSize: pageSize,
+          currentPage: page
+        }
+        console.log(result);
+      }
+
+      client.close();
+      res.json(results);
+    })
+  })
+});
+
+// 新增手机
+app.post('/api/addPhone', upload.single('file'), function(req, res) {
+  console.log(req.file);
+  console.log(req.body);
+  // 如果想要通过浏览器访问到这张图片的话，是不是需要将图片放到public里面去
+  var filename = new Date().getTime() + '_' + req.file.originalname;
+  var newFileName = path.resolve('E:/H5/4/xiezhiliSys/code/img', filename);
+  try {
+    // fs.renameSync(req.file.path, newFileName);
+    var data = fs.readFileSync(req.file.path);
+    fs.writeFileSync(newFileName, data);
+
+    // console.log(req.body);
+    // res.send('上传成功');
+    // 操作数据库写入
+    MongoClient.connect(url, {useNewUrlParser: true}, function(err, client) {
+
+      var db = client.db('project');
+      var str='img/'+filename;
+      db.collection('phone').insertOne({
+        name: req.body.name, 
+        src: str,
+        brand: req.body.brand,
+        price: req.body.price,
+        money: req.body.money,
+      }, function(err) {
+        // res.send('新增手机成功');
+        res.render("http://127.0.0.1:8080/phone.html")
+      })
+
+    })
+
+
+  } catch (error) {
+    res.render('error', {
+      message: '新增手机失败',
+      error: error
+    })
+  }
+
+})
+
 
 app.listen(3000);

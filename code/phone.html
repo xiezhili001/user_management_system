@@ -1,1 +1,223 @@
-phone
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>我的后台管理系统</title>
+    <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/index.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+        img{
+        width: 50px;
+        height: 40px;
+    }
+    td{
+        text-align: center;
+        vertical-align: middle!important;
+    }
+    #insertPhone{
+        height: 400px;
+        width: 600px;
+        position: absolute;
+        background: #fff;
+        left: 380px;
+        top: 80px;
+        padding-left: 100px;
+        border: 1px solid #ccc;
+        padding-top: 100px;
+        display: none;
+    }
+  </style>
+</head>
+
+<body>
+    <div id="insertPhone">
+        <form action="http://127.0.0.1:3000/api/addPhone" method="POST" enctype="multipart/form-data">
+            图片：&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <input style="display:inline-block" type="file" name="file" /><br>
+            名称： &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="name"><br>
+            品牌： &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="brand"> <br>
+            官方指导价： <input type="text" name="price"> <br>
+            二手回收价:：<input type="text" name="money">
+            <button class="btn btn-primary" type="submit">确认</button>
+            <div class="btn btn-primary" id="cancel">取消</div>
+        </form>
+    </div>
+
+
+    <div class="container">
+
+        <div class="lv-head">
+            <div class="left">
+                <a href="/" class="logo">xx后台管理系统</a>
+            </div>
+            <div class="right">
+                <p>欢迎您 - xxx (管理员)</p>
+                <button class="btn btn-primary">退出</button>
+            </div>
+        </div>
+
+        <div class="lv-main">
+            <ul class="lv-menu">
+                <li><a id="user" style="cursor:pointer" href="index.html">用户管理</a></li>
+                <li><a id="brand" style="cursor:pointer" href="/brand.html">品牌管理</a></li>
+                <li><a id="phone" style="cursor:pointer" href="/phone.html">手机管理</a></li>
+            </ul>
+
+            <div class="body" style="background:#fff">
+
+
+                <button class="btn btn-primary insertPhone">新增手机</button>
+
+
+                <div id="wode">
+
+                </div>
+                <div id="tiaozhuang"></div>
+            </div>
+
+        </div>
+
+        <div class="lv-foot">
+            我是底部
+        </div>
+
+    </div>
+
+
+    <script src="./js/template-web.js"></script>
+
+    <script id="tpl-user" type="text/html">
+        <table class="table table-striped table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>图片</th>
+            <th>名称</th>
+            <th>品牌</th>
+            <th>价格</th>
+            <th>二手价</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+            {{each list}}
+            <tr>
+              <td>{{$index+1}}</td>
+              <td> <img src="{{$value.src}}" alt=""></td>
+              <td>{{$value.name}}</td>
+              <td>{{$value.brand}}</td>
+              <td>{{$value.price}}</td>
+              <td>{{$value.money}}</td>
+              <td><a index="{{$value._id}}" class="delete" style="cursor:pointer">删除</a></td>      
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+   
+    </script>
+
+    <script>
+        $(function () {
+            getList();
+            //搜索------------------------------------------
+
+        })
+
+        // 获取手机列表---------------------------
+        function getList(page, pageSize) {
+
+            try {
+                var page = location.search.split('&')[0].split("=")[1] || 1;
+                var pageSize = location.search.split('&')[1].split("=")[1] || 5;
+            } catch (error) {
+                var page = 1;
+                var pageSize = 5;
+            }
+            console.log(pageSize);
+
+
+            $.get('http://127.0.0.1:3000/api/phone/list', {
+                page: page,
+                pageSize: pageSize
+            }, function (res) {
+                if (res.code === 0) {
+                    var list = res.data.list;
+                    var totalPage = res.data.totalPage;
+                    var currentPage = res.data.currentPage;
+                    var html = template('tpl-user', {
+                        list: list
+                    });
+                    $('#wode').append(html);
+                    var str = ''
+                    for (var i = 0; i < totalPage; i++) {
+                        // console.log(1);
+                        str +=
+                            ` <li class="${ currentPage === (i+1) ? 'active': ''}"><a href="/phone.html?page=${ i+1 }&pageSize=${ pageSize } ">
+                 ${i + 1}</a></li> `
+                    }
+
+                    var str1 =
+                        `     
+            <nav>
+            <ul class="pagination">
+              <li>
+                <a href="/phone.html?page=${currentPage - 1 < 1 ? 1: currentPage - 1 }&pageSize=${pageSize}" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              ${str}
+              <li>
+                <a href="/phone.html?page=${ currentPage + 1 > totalPage ? totalPage: currentPage + 1 }&pageSize=${pageSize } "
+                  aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>                    
+          `
+                    $('#tiaozhuang').append(str1);
+
+                    //删除--------------------------------------------------------------
+                    $('.delete').click(function (e) {
+                        e.preventDefault();
+                        console.log($(this).attr('index'));
+                        $.get('http://127.0.0.1:3000/api/delete', {
+                            id: $(this).attr('index')
+                        }, function (res) {
+                            if (res.code === 0) {
+                                location.reload();
+                            }
+                        })
+                    });
+                } else {
+                    alert(res.msg);
+                }
+            })
+        }
+    </script>
+
+    <script>
+        $(function () {
+            $(".insertPhone").click(function () {
+
+                $("#insertPhone").css({
+                    display: "block"
+                })
+                $("#cancel").click(function(){
+                    $("#insertPhone").css({
+                    display: "none"
+                })
+                })
+
+            })
+        })
+    </script>
+
+</body>
+
+</html>
