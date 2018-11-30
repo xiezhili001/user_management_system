@@ -12,11 +12,57 @@
   <link rel="stylesheet" href="./css/index.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <style>
-
+    td{
+        text-align: center;
+        vertical-align: middle!important;
+    }
+    form{
+        height: 400px;
+        width: 600px;
+        position: absolute;
+        background: #fff;
+        left: 380px;
+        top: 80px;
+        padding-left: 100px;
+        border: 1px solid #ccc;
+        padding-top: 100px;
+        display: none;
+    }
   </style>
 </head>
 
 <body>
+
+  <form action="http://127.0.0.1:3000/api/user/update" method="get" enctype="multipart/form-data">
+    <label>
+      <div name='123' value='123'></div>
+      <span>用户名：</span>
+      <input type="text" id="name" placeholder="请输入用户名" name="username">
+    </label>
+    <label>
+      <span>昵称：</span>
+      <input type="text" id="nickname" placeholder="请输入昵称" name="nickname">
+    </label>
+    <label>
+      <span>年龄：</span>
+      <input type="text" id="age" placeholder="请输入年龄" name="age">
+    </label>
+    <label>
+      <span>性别：</span>
+      <input type="radio" name="sex" value="男" > 男
+      <input type="radio" name="sex" value="女"> 女
+    </label>
+    <label>
+      <span>管理员：</span>
+      <input type="radio" name="isAdmin" value="是"> 是
+      <input type="radio" name="isAdmin" value="否" > 否
+    </label>
+    <button class="btn btn-primary" type="submit">确认</button>
+    <div class="btn btn-primary" id="cancel">取消</div>
+  </form>
+
+
+
   <div class="container">
 
     <div class="lv-head">
@@ -55,7 +101,7 @@
     </div>
 
   </div>
-  
+
 
   <script src="./js/template-web.js"></script>
 
@@ -81,7 +127,10 @@
               <td>{{$value.age}}</td>
               <td>{{$value.sex}}</td>
               <td>{{$value.isAdmin}}</td>
-              <td><a index="{{$value._id}}" class="delete" style="cursor:pointer">删除</a></td>      
+              <td>
+                <a index="{{$value._id}}" class="delete" style="cursor:pointer">删除</a>
+                <a index="{{$value._id}}" class="update" style="cursor:pointer">修改</a>
+              </td>      
             </tr>
           {{/each}}
         </tbody>
@@ -93,10 +142,10 @@
     $(function () {
       getList();
       //搜索------------------------------------------
-      $('#searchBtn').click(function(){
-        $.get('http://127.0.0.1:3000/api/user/search',{
-          name:$('#searchInput').val()
-        },function(res){
+      $('#searchBtn').click(function () {
+        $.get('http://127.0.0.1:3000/api/user/search', {
+          name: $('#searchInput').val()
+        }, function (res) {
           console.log(res.data.list);
           var html = template('tpl-user', {
             list: res.data.list
@@ -104,10 +153,6 @@
           $('#wode').html(html);
         })
       })
-
-
-
-
 
 
     })
@@ -177,13 +222,60 @@
               }
             })
           });
+
+          // 修改
+          $(".update").click(function(){
+            $("form").css({
+              display:"block"
+            })
+            var username=$(this).parent().parent().children().eq(1).html();
+            var nickname=$(this).parent().parent().children().eq(2).html();
+            var age=$(this).parent().parent().children().eq(3).html();
+            var sex=$(this).parent().parent().children().eq(4).html();
+            var isAdmin=$(this).parent().parent().children().eq(5).html();
+            $('#name').val(username)
+            $('#nickname').val(nickname)
+            $('#age').val(age)
+            $('input[type="radio"]').remove("checked")
+            if( '女'== sex){
+              $('input[type="radio"]').eq(1).attr("checked",'true')
+            }else{
+              $('input[type="radio"]').eq(0).attr("checked",'true')
+            }
+            console.log(isAdmin);
+            if(isAdmin){
+              $('input[type="radio"]').eq(3).attr("checked",'true')
+            }else{
+              $('input[type="radio"]').eq(4).attr("checked",'true')
+            }
+           
+
+            console.log(sex);
+
+          })
+          $("#cancel").click(function(){
+            $("form").css({
+              display:"none"
+            })
+          })
+          // $('.delete').click(function (e) {
+          //   e.preventDefault();
+          //   console.log($(this).attr('index'));
+          //   $.get('http://127.0.0.1:3000/api/delete', {
+          //     id: $(this).attr('index')
+          //   }, function (res) {
+          //     if (res.code === 0) {
+          //       location.reload();
+          //     }
+          //   })
+          // });
+
         } else {
           alert(res.msg);
         }
       })
     }
   </script>
-
 
 </body>
 

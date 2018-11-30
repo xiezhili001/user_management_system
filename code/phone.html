@@ -183,17 +183,7 @@
                     $('#tiaozhuang').append(str1);
 
                     //删除--------------------------------------------------------------
-                    $('.delete').click(function (e) {
-                        e.preventDefault();
-                        console.log($(this).attr('index'));
-                        $.get('http://127.0.0.1:3000/api/delete', {
-                            id: $(this).attr('index')
-                        }, function (res) {
-                            if (res.code === 0) {
-                                location.reload();
-                            }
-                        })
-                    });
+                   
                 } else {
                     alert(res.msg);
                 }

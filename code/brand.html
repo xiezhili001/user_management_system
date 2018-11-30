@@ -2,35 +2,151 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>我的后台管理系统</title>
-    <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="./css/reset.css">
-    <link rel="stylesheet" href="./css/common.css">
-    <link rel="stylesheet" href="./css/index.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>我的后台管理系统</title>
+  <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <style>
+
+  </style>
 </head>
-<div id="insertPhone"> 
-        图片： &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text"><br>
-        名称： &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text"><br>
-        品牌： &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text"> <br>
-        官方指导价： <input type="text"> <br>
-        二手回收价:：<input type="text"> 
-</div>
 
+<body>
+  <div class="container">
 
+    <div class="lv-head">
+      <div class="left">
+        <a href="/" class="logo">xx后台管理系统</a>
+      </div>
+      <div class="right">
+        <p>欢迎您 - xxx (管理员)</p>
+        <button class="btn btn-primary">退出</button>
+      </div>
+    </div>
 
+    <div class="lv-main">
+      <ul class="lv-menu">
+        <li><a id="user" style="cursor:pointer" href="index.html">用户管理</a></li>
+        <li><a id="brand" style="cursor:pointer" href="/brand.html">品牌管理</a></li>
+        <li><a id="phone" style="cursor:pointer" href="/phone.html">手机管理</a></li>
+      </ul>
 
+      <div class="body" style="background:#fff">
+          <button >新增品牌</button>
 
+        <div id="wode">
 
+        </div>
+        <div id="tiaozhuang"></div>
+      </div>
 
+    </div>
 
+    <div class="lv-foot">
+      我是底部
+    </div>
 
+  </div>
+  
 
+  <script src="./js/template-web.js"></script>
 
+  <script id="tpl-user" type="text/html">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>序号</th>
+            <th>名称</th>
+            <th>品牌</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+            {{each list}}
+            <tr>
+              <td>{{$index+1}}</td>
+              <td>{{$value.name}}</td>
+              <td>{{$value.brand}}</td>
+              <td><a index="{{$value._id}}" class="delete" style="cursor:pointer">删除</a></td>      
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+   
+  </script>
 
+  <script>
+    $(function () {
+      getList();
+
+    })
+
+    // 获取用户列表---------------------------
+    function getList(page, pageSize) {
+
+      try {
+        var page = location.search.split('&')[0].split("=")[1] || 1;
+        var pageSize = location.search.split('&')[1].split("=")[1] || 5;
+      } catch (error) {
+        var page = 1;
+        var pageSize = 5;
+      }
+
+      console.log(pageSize);
+      $.get('http://127.0.0.1:3000/api/brand/list', {
+        page: page,
+        pageSize: pageSize
+      }, function (res) {
+        if (res.code === 0) {
+          var list = res.data.list;
+          var totalPage = res.data.totalPage;
+          var currentPage = res.data.currentPage;
+          var html = template('tpl-user', {
+            list: list
+          });
+          $('#wode').append(html);
+          var str = ''
+          for (var i = 0; i < totalPage; i++) {
+            // console.log(1);
+            str +=
+              ` <li class="${ currentPage === (i+1) ? 'active': ''}"><a href="/brand.html?page=${ i+1 }&pageSize=${ pageSize } ">
+                 ${i + 1}</a></li> `
+          }
+
+          var str1 =
+            `     
+            <nav>
+            <ul class="pagination">
+              <li>
+                <a href="/brand.html?page=${currentPage - 1 < 1 ? 1: currentPage - 1 }&pageSize=${pageSize}" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              ${str}
+              <li>
+                <a href="/brand.html?page=${ currentPage + 1 > totalPage ? totalPage: currentPage + 1 }&pageSize=${pageSize } "
+                  aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>                    
+          `
+          $('#tiaozhuang').append(str1);
+
+          //删除--------------------------------------------------------------
+          
+        } else {
+          alert(res.msg);
+        }
+      })
+    }
+  </script>
 
 
 </body>

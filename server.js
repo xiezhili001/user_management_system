@@ -24,7 +24,10 @@ app.use(function (req, res, next) {
   next();
 })
 
-// 登录的请求 localhost:3000/api/login
+
+
+
+// 登录的请求 localhost:3000/api/login---------------------------
 app.post('/api/login', function (req, res) {
   var username = req.body.username;
   var password = req.body.password;
@@ -66,7 +69,7 @@ app.post('/api/login', function (req, res) {
   })
 });
 
-// 注册的请求
+// 注册的请求--------------------------------
 app.post('/api/register', function (req, res) {
   var name = req.body.name;
   var pwd = req.body.pwd;
@@ -135,7 +138,7 @@ app.post('/api/register', function (req, res) {
   })
 });
 
-// 用户列表的接口
+// 用户列表的接口--------------------------------------------------
 app.get('/api/user/list', function (req, res) {
   var page = parseInt(req.query.page);
   var pageSize = parseInt(req.query.pageSize);
@@ -200,7 +203,7 @@ app.get('/api/user/list', function (req, res) {
   })
 });
 
-//删除的借口
+//删除的借口-------------------------------------------------
 app.get('/api/delete', function (req, res) {
   var id = req.query.id;
   var results = {};
@@ -236,7 +239,7 @@ app.get('/api/delete', function (req, res) {
   })
 })
 
-// 用户搜索
+// 用户搜索--------------------------------------------
 app.get('/api/user/search', function (req, res) {
   var name = req.query.name;
   var filter = new RegExp(name);
@@ -275,7 +278,7 @@ app.get('/api/user/search', function (req, res) {
   })
 })
 
-//手机列表的借口
+//手机列表的借口-------------------------------------------
 app.get('/api/phone/list', function (req, res) {
  
   var page = parseInt(req.query.page);
@@ -333,7 +336,6 @@ app.get('/api/phone/list', function (req, res) {
           pageSize: pageSize,
           currentPage: page
         }
-        console.log(result);
       }
 
       client.close();
@@ -342,10 +344,8 @@ app.get('/api/phone/list', function (req, res) {
   })
 });
 
-// 新增手机
+// 新增手机-------------------------------------------
 app.post('/api/addPhone', upload.single('file'), function(req, res) {
-  console.log(req.file);
-  console.log(req.body);
   // 如果想要通过浏览器访问到这张图片的话，是不是需要将图片放到public里面去
   var filename = new Date().getTime() + '_' + req.file.originalname;
   var newFileName = path.resolve('E:/H5/4/xiezhiliSys/code/img', filename);
@@ -354,8 +354,6 @@ app.post('/api/addPhone', upload.single('file'), function(req, res) {
     var data = fs.readFileSync(req.file.path);
     fs.writeFileSync(newFileName, data);
 
-    // console.log(req.body);
-    // res.send('上传成功');
     // 操作数据库写入
     MongoClient.connect(url, {useNewUrlParser: true}, function(err, client) {
 
@@ -369,12 +367,10 @@ app.post('/api/addPhone', upload.single('file'), function(req, res) {
         money: req.body.money,
       }, function(err) {
         // res.send('新增手机成功');
-        res.render("http://127.0.0.1:8080/phone.html")
+        // res.render("http://127.0.0.1:8080/phone.html")
       })
 
     })
-
-
   } catch (error) {
     res.render('error', {
       message: '新增手机失败',
@@ -382,6 +378,252 @@ app.post('/api/addPhone', upload.single('file'), function(req, res) {
     })
   }
 
+})
+
+
+//删除的借口-------------------------------------------
+app.get('/api/delete', function (req, res) {
+  var id = req.query.id;
+  var results = {};
+  MongoClient.connect(url, {
+    useNewUrlParser: true
+  }, function (err, client) {
+    if (err) {
+      results.code = -1;
+      results.msg = '数据库连接失败';
+      res.json(results);
+
+      return;
+    }
+
+    var db = client.db('project');
+    db.collection('user').deleteOne({
+      _id: ObjectId(id)
+    }, function (err, data) {
+      if (err) {
+        results.code = -1;
+        results.msg = '数据库连接失败';
+        res.json(results);
+      } else {
+        // 删除成功，页面刷新一下
+        results.code = 0;
+        results.msg = '查询成功';
+        client.close();
+        res.json(results);
+      }
+
+      client.close();
+    })
+  })
+})
+
+// 用户搜索-------------------------------------------
+app.get('/api/user/search', function (req, res) {
+  var name = req.query.name;
+  var filter = new RegExp(name);
+
+  MongoClient.connect(url, {
+    useNewUrlParser: true
+  }, function (err, client) {
+    if (err) {
+      res.json({
+        code: -1,
+        msg: '链接失败'
+      })
+      return;
+    }
+
+    var db = client.db('project');
+    db.collection('user').find({
+      nickname: filter
+    }).toArray(function (err, data) {
+      if (err) {
+        res.json({
+          code: -1,
+          msg: '查询失败'
+        })
+      } else {
+        res.json({
+          code: 0,
+          msg: '查询成功',
+          data: {
+            list:data
+          }
+        })
+      }
+    })
+
+  })
+})
+
+//手机列表的借口-------------------------------------------
+app.get('/api/phone/list', function (req, res) {
+ 
+  var page = parseInt(req.query.page);
+  var pageSize = parseInt(req.query.pageSize);
+  var totalSize = 0;
+  var totalPage = 0;
+
+  var results = {};
+
+  MongoClient.connect(url, {
+    useNewUrlParser: true
+  }, function (err, client) {
+    if (err) {
+      results.code = -1;
+      results.msg = '数据库连接失败';
+      res.json(results);
+      // 关闭数据库连接
+      return;
+    }
+
+    var db = client.db('project');
+
+    async.series([
+      function (cb) {
+        db.collection('phone').find().count(function (err, num) {
+          if (err) {
+            cb(err);
+          } else {
+            totalSize = num;
+            cb(null);
+          }
+        })
+      },
+      function (cb) {
+        db.collection('phone').find().limit(pageSize).skip(page * pageSize - pageSize).toArray(function (err, data) {
+          if (err) {
+            cb(err);
+          } else {
+            cb(null, data);
+          }
+        })
+      }
+    ], function (err, result) {
+      if (err) {
+        results.code = -1;
+        results.msg = err.message;
+      } else {
+        totalPage = Math.ceil(totalSize / pageSize);
+
+        results.code = 0;
+        results.msg = '查询成功';
+        results.data = {
+          list: result[1],
+          totalPage: totalPage,
+          pageSize: pageSize,
+          currentPage: page
+        }
+      }
+
+      client.close();
+      res.json(results);
+    })
+  })
+});
+
+// 品牌的接口列表-------------------------------------------
+app.get('/api/brand/list', function (req, res) {
+ 
+  var page = parseInt(req.query.page);
+  var pageSize = parseInt(req.query.pageSize);
+  var totalSize = 0;
+  var totalPage = 0;
+  var results = {};
+
+  MongoClient.connect(url, {
+    useNewUrlParser: true
+  }, function (err, client) {
+    if (err) {
+      results.code = -1;
+      results.msg = '数据库连接失败';
+      res.json(results);
+      // 关闭数据库连接
+      return;
+    }
+
+    var db = client.db('project');
+
+    async.series([
+      function (cb) {
+        db.collection('brand').find().count(function (err, num) {
+          if (err) {
+            cb(err);
+          } else {
+            totalSize = num;
+            cb(null);
+          }
+        })
+      },
+      function (cb) {
+        db.collection('brand').find().limit(pageSize).skip(page * pageSize - pageSize).toArray(function (err, data) {
+          if (err) {
+            cb(err);
+          } else {
+            cb(null, data);
+          }
+        })
+      }
+    ], function (err, result) {
+      if (err) {
+        results.code = -1;
+        results.msg = err.message;
+      } else {
+        totalPage = Math.ceil(totalSize / pageSize);
+
+        results.code = 0;
+        results.msg = '查询成功';
+        results.data = {
+          list: result[1],
+          totalPage: totalPage,
+          pageSize: pageSize,
+          currentPage: page
+        }
+      }
+
+      client.close();
+      res.json(results);
+    })
+  })
+});
+
+// 用户修改
+app.get('/api/user/update', function (req, res) {
+  // console.log(req.query);
+  var username = req.query.username;
+  var results = {};
+  MongoClient.connect(url, {
+    useNewUrlParser: true
+  }, function (err, client) {
+    if (err) {
+      results.code = -1;
+      results.msg = '数据库连接失败';
+      res.json(results);
+
+      return;
+    }
+
+    var db = client.db('project');
+    db.collection('user').updateOne({
+      username: username
+    },{$set: {username: username,nickname:req.query.nickname,age:req.query.age,sex:req.query.sex,isAdmin:req.query.isAdmin=='是'?true:false}}, function (err, data) {
+      if (err) {
+        results.code = -1;
+        results.msg = '数据库连接失败';
+        res.json(results);
+        
+      } else {
+        // 删除成功，页面刷新一下
+        results.code = 0;
+        results.msg = '查询成功';
+        client.close();
+        console.log(1);
+      }
+      res.send('<script>location.href="http://127.0.0.1:8080/index.html"</script>')
+
+      client.close();
+    })
+  })
 })
 
 
