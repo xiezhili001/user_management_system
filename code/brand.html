@@ -12,7 +12,10 @@
   <link rel="stylesheet" href="./css/index.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <style>
-
+    .body button{
+        margin: 20px 0px;
+    }
+   
   </style>
 </head>
 
@@ -21,23 +24,24 @@
 
     <div class="lv-head">
       <div class="left">
-        <a href="/" class="logo">xx后台管理系统</a>
+        <a href="/" class="logo">后台管理系统</a>
       </div>
       <div class="right">
-        <p>欢迎您 - xxx (管理员)</p>
+        <p id="mingzi">欢迎您 - xxx (管理员)</p>
         <button class="btn btn-primary">退出</button>
       </div>
     </div>
 
     <div class="lv-main">
       <ul class="lv-menu">
-        <li><a id="user" style="cursor:pointer" href="index.html">用户管理</a></li>
+        <li><a id="user" style="cursor:pointer" href="user.html">用户管理</a></li>
         <li><a id="brand" style="cursor:pointer" href="/brand.html">品牌管理</a></li>
         <li><a id="phone" style="cursor:pointer" href="/phone.html">手机管理</a></li>
       </ul>
 
       <div class="body" style="background:#fff">
-          <button >新增品牌</button>
+
+        <button>新增品牌</button>
 
         <div id="wode">
 
@@ -48,11 +52,11 @@
     </div>
 
     <div class="lv-foot">
-      我是底部
+
     </div>
 
   </div>
-  
+
 
   <script src="./js/template-web.js"></script>
 
@@ -120,7 +124,7 @@
 
           var str1 =
             `     
-            <nav>
+            <nav style="position:absolute;right:150px;bottom:50px">
             <ul class="pagination">
               <li>
                 <a href="/brand.html?page=${currentPage - 1 < 1 ? 1: currentPage - 1 }&pageSize=${pageSize}" aria-label="Previous">
@@ -140,7 +144,7 @@
           $('#tiaozhuang').append(str1);
 
           //删除--------------------------------------------------------------
-          
+
         } else {
           alert(res.msg);
         }
@@ -148,7 +152,7 @@
     }
   </script>
 
-
+  <script src='./js/common.js'></script>
 </body>
 
 </html>

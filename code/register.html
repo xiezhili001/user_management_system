@@ -9,41 +9,55 @@
     <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/reset.css">
     <link rel="stylesheet" href="./css/common.css">
+    <style>
+        .container{
+            width: 400px;
+            height: 400px;
+            border: 1px solid #f1f2f2;
+            border-radius: 4px;
+            background: #fff;
+            margin-top: 50px;
+            padding: 20px
+        }
+        input{
+            margin-top: 10px;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
         <!-- <form> -->
-            <label>
-                <span>用户名：</span>
-                <input type="text" id="name" placeholder="请输入用户名">
-            </label>
-            <label>
-                <span>密码：</span>
-                <input type="password" id="pwd" placeholder="请输入密码">
-            </label>
-            <label>
-                <span>昵称：</span>
-                <input type="text" id="nickname" placeholder="请输入昵称">
-            </label>
-            <label>
-                <span>年龄：</span>
-                <input type="text" id="age" placeholder="请输入年龄">
-            </label>
-            <label>
-                <span>性别：</span>
-                <input type="radio" name="sex" value="男" checked> 男
-                <input type="radio" name="sex" value="女"> 女
-            </label>
-            <label>
-                <span>管理员：</span>
-                <input type="radio" name="isAdmin" value="是"> 是
-                <input type="radio" name="isAdmin" value="否" checked> 否
-            </label>
+        <label>
+            <span>用户名：</span>
+            <input type="text" id="name" placeholder="请输入用户名">
+        </label>
+        <label>
+            <span>密码：</span>&nbsp;&nbsp;&nbsp;
+            <input type="password" id="pwd" placeholder="请输入密码">
+        </label>
+        <label>
+            <span>昵称：</span>&nbsp;&nbsp;&nbsp;
+            <input type="text" id="nickname" placeholder="请输入昵称">
+        </label>
+        <label style="margin-bottom:10px">
+            <span>年龄：</span>&nbsp;&nbsp;&nbsp;
+            <input type="text" id="age" placeholder="请输入年龄">
+        </label>
+        <label style="margin-bottom:10px">
+            <span>性别：</span>&nbsp;&nbsp;&nbsp;   
+            <input type="radio" name="sex" value="男" checked style="margin-left: 2px"> 男
+            <input type="radio" name="sex" value="女"> 女
+        </label>
+        <label style="margin-bottom:10px">
+            <span>管理员：</span>
+            <input type="radio" name="isAdmin" value="是"> 是
+            <input type="radio" name="isAdmin" value="否" checked> 否
+        </label>
 
-            <input type="submit" value="注册" id="btn">
+        <input type="submit" value="注册" id="btn" style="margin-bottom:10px">
 
-            <a href="/login.html">已有账号，立即登陆</a>
+        <a href="/login.html">已有账号，立即登陆</a>
         <!-- </form> -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script>
@@ -55,7 +69,7 @@
                         nickname: $('#nickname').val(),
                         age: $('#age').val(),
                         sex: $($('input[type=radio]:checked')[0]).val(),
-                        isAdmin : $($('input[type=radio]:checked')[1]).val()
+                        isAdmin: $($('input[type=radio]:checked')[1]).val()
                     }, function (res) {
                         console.log(1);
                         if (res.code === 0) {
@@ -63,7 +77,7 @@
                             // 成功
                             alert('注册成功');
                             location.href = '/login.html';
-                           
+
                         } else {
                             alert(res.msg);
                         }

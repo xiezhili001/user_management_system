@@ -7,14 +7,35 @@
   <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="./css/reset.css">
   <link rel="stylesheet" href="./css/common.css">
+  <style>
+    div{
+      background: #fff;
+      width: 400px;
+      margin: 0 auto;
+      height: 400px;
+      border: 1px solid #f1f2f2;
+      border-radius: 4px;  
+      padding: 50px;
+      margin-top: 50px;
+    }
+    input{
+      margin-top: 40px;
+    }
+    button{
+      margin-top: 40px;
+      width: 80px;
+      margin-left: 80px;
+    }
+  </style>
 </head>
 
 <body>
 
   <div>
-    <input type="text" placeholder="name">
-    <input type="password" placeholder="pwd">
-    <button id="btn">按钮</button>
+    用户名：<input type="text" placeholder="请输入用户名"><br>
+    密码：&nbsp;&nbsp;&nbsp;<input type="password" placeholder="请输入密码"><br>
+    <button id="btn">登录</button>
+    <a href="register.html">注册</a>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -31,7 +52,8 @@
             alert('登录成功');
             location.href = '/index.html';
             // 用 localStorage
-            localStorage.setItem('nickname', res.data.nickname);
+
+            localStorage.setItem('nickname', [res.data.nickname, res.data.isAdmin]);
           } else {
             alert(res.msg);
           }
@@ -39,6 +61,7 @@
       })
     });
   </script>
+
 </body>
 
 </html>

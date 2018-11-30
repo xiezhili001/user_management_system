@@ -60,7 +60,9 @@ app.post('/api/login', function (req, res) {
         results.code = 0;
         results.msg = '登录成功';
         results.data = {
-          nickname: data[0].nickname
+          nickname: data[0].nickname,
+          isAdmin: data[0].isAdmin
+
         }
       }
       client.close();
@@ -381,7 +383,7 @@ app.post('/api/addPhone', upload.single('file'), function(req, res) {
 })
 
 
-//删除的借口-------------------------------------------
+//删除用户的借口-------------------------------------------
 app.get('/api/delete', function (req, res) {
   var id = req.query.id;
   var results = {};
@@ -619,12 +621,53 @@ app.get('/api/user/update', function (req, res) {
         client.close();
         console.log(1);
       }
-      res.send('<script>location.href="http://127.0.0.1:8080/index.html"</script>')
+      res.send('<script>location.href="http://127.0.0.1:8080/user.html"</script>')
 
       client.close();
     })
   })
 })
 
+//删除手机的借口-------------------------------------------
+app.get('/api/phone/delete', function (req, res) {
+  var id = req.query.id;
+  var src='code/'+req.query.src;
+  console.log(src);
+  fs.unlink(src, function (err) {
+    if (err) throw err;
+    console.log('删除成功');
+})
+  var results = {};
+  MongoClient.connect(url, {
+    useNewUrlParser: true
+  }, function (err, client) {
+    if (err) {
+      results.code = -1;
+      results.msg = '数据库连接失败';
+      res.json(results);
+
+      return;
+    }
+
+    var db = client.db('project');
+    db.collection('phone').deleteOne({
+      _id: ObjectId(id)
+    }, function (err, data) {
+      if (err) {
+        results.code = -1;
+        results.msg = '数据库连接失败';
+        res.json(results);
+      } else {
+        // 删除成功，页面刷新一下
+        results.code = 0;
+        results.msg = '查询成功';
+        client.close();
+        res.json(results);
+      }
+
+      client.close();
+    })
+  })
+})
 
 app.listen(3000);

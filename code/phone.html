@@ -27,10 +27,23 @@
         background: #fff;
         left: 380px;
         top: 80px;
-        padding-left: 100px;
+        padding-left: 150px;
         border: 1px solid #ccc;
         padding-top: 100px;
         display: none;
+    }
+    .body button{
+        margin: 20px 0px;
+    }
+    #insertPhone input{
+        margin: 5px 0;
+    }
+    #insertPhone button{
+        margin-top: 10px;
+        margin-left: 150px;
+    }
+    #cancel{
+        margin-top: 10px;
     }
   </style>
 </head>
@@ -42,7 +55,7 @@
             名称： &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="name"><br>
             品牌： &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="brand"> <br>
             官方指导价： <input type="text" name="price"> <br>
-            二手回收价:：<input type="text" name="money">
+            二手回收价:：<input type="text" name="money"><br>
             <button class="btn btn-primary" type="submit">确认</button>
             <div class="btn btn-primary" id="cancel">取消</div>
         </form>
@@ -53,17 +66,17 @@
 
         <div class="lv-head">
             <div class="left">
-                <a href="/" class="logo">xx后台管理系统</a>
+                <a href="/" class="logo">后台管理系统</a>
             </div>
             <div class="right">
-                <p>欢迎您 - xxx (管理员)</p>
+                <p id="mingzi">欢迎您 - xxx (管理员)</p>
                 <button class="btn btn-primary">退出</button>
             </div>
         </div>
 
         <div class="lv-main">
             <ul class="lv-menu">
-                <li><a id="user" style="cursor:pointer" href="index.html">用户管理</a></li>
+                <li><a id="user" style="cursor:pointer" href="user.html">用户管理</a></li>
                 <li><a id="brand" style="cursor:pointer" href="/brand.html">品牌管理</a></li>
                 <li><a id="phone" style="cursor:pointer" href="/phone.html">手机管理</a></li>
             </ul>
@@ -83,7 +96,7 @@
         </div>
 
         <div class="lv-foot">
-            我是底部
+            
         </div>
 
     </div>
@@ -163,7 +176,7 @@
 
                     var str1 =
                         `     
-            <nav>
+            <nav style="position:absolute;right:150px;bottom:50px">
             <ul class="pagination">
               <li>
                 <a href="/phone.html?page=${currentPage - 1 < 1 ? 1: currentPage - 1 }&pageSize=${pageSize}" aria-label="Previous">
@@ -183,7 +196,21 @@
                     $('#tiaozhuang').append(str1);
 
                     //删除--------------------------------------------------------------
-                   
+                    $('.delete').click(function (e) {
+                        e.preventDefault();
+                        console.log($(this).attr('index'));
+                        $.get('http://127.0.0.1:3000/api/phone/delete', {
+                            id: $(this).attr('index'),
+                            src: $(this).parent().parent().children().eq(1).children().attr('src')
+                        }, function (res) {
+                            if (res.code === 0) {
+                                
+                                location.reload();
+                            }
+                        })
+                    });
+
+
                 } else {
                     alert(res.msg);
                 }
@@ -198,16 +225,16 @@
                 $("#insertPhone").css({
                     display: "block"
                 })
-                $("#cancel").click(function(){
+                $("#cancel").click(function () {
                     $("#insertPhone").css({
-                    display: "none"
-                })
+                        display: "none"
+                    })
                 })
 
             })
         })
     </script>
-
+    <script src='./js/common.js'></script>
 </body>
 
 </html>
